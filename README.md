@@ -1,4 +1,3 @@
-# Basic Project
-## This file is modified to include a link to google site
+# Basic Java Slenenium aimAutomation Project
+### Basic aotomation projects
 
-[Google](https://google.com)
