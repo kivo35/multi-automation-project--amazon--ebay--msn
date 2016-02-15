@@ -1,3 +1,3 @@
-# Basic Java Slenenium aimAutomation Project
+# Basic Java Slenenium Automation Project
 ### Basic aotomation projects
 
