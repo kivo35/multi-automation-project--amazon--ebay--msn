@@ -8,7 +8,7 @@ Validate that the user has added that number of items to thier cart.
 * User adds three items to their cart.
 Validate that the total cost comes out to what they would expect to have in their shopping cart.
 
-* (Create your own test case)
+* User adds item to their cart. Clicks "save for later". Verify the cart number cart number decreases by 1. Verify that save for later counter increase by 1. User clicks "delete". Verify that save for later counter decreases by 1.
 
 #### Ebay
 * User watches a particular item. Validate that the item is in the user's account as that item being watched.
