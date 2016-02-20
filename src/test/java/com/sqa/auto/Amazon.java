@@ -51,7 +51,8 @@ public class Amazon {
 
 	@DataProvider
 	public Object[][] quantityData() {
-		return new Object[][] { new Object[] { "Test 1", "Apple Watch", "3" } };
+		return new Object[][] { new Object[] { "Test 1", "Apple Watch", "3" }, { "Test 2", "Macbook Pro", "2" },
+				{ "Test 3", "Red Ball", "4" } };
 	}
 
 	@Test(dataProvider = "totalCost")
