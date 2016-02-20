@@ -18,11 +18,11 @@ import org.testng.annotations.Test;
 public class Amazon
 {
 
+	private final static String BASE_URL = "http://amazon.com";
+
 	private WebDriver driver;
 
 	private WebDriverWait wait;
-
-	private final static String BASE_URL = "http://amazon.com";
 
 	@AfterClass
 	public void afterClass()
@@ -40,7 +40,7 @@ public class Amazon
 	@Test(dataProvider = "quantityData", enabled = false)
 	public void cartQuantity(String label, String item, String quantity)
 	{
-		this.driver.get(this.BASE_URL);
+		this.driver.get(BASE_URL);
 		System.out.println(label);
 		this.driver.findElement(By.cssSelector("#twotabsearchtextbox")).sendKeys(item);
 		this.driver.findElement(By.cssSelector(".nav-input")).click();
@@ -57,7 +57,8 @@ public class Amazon
 	@DataProvider
 	public Object[][] quantityData()
 	{
-		return new Object[][] { new Object[] { "Test 1", "Apple Watch", "3" } };
+		return new Object[][] { new Object[] { "Test 1", "Apple Watch", "3" },
+				{ "Test 2", "Macbook Pro", "2" }, { "Test 3", "Red Ball", "4" } };
 	}
 
 	@DataProvider
@@ -71,6 +72,7 @@ public class Amazon
 	@Test(dataProvider = "saveForLaterItem")
 	public void saveForLaterTest(String searchItem, String linkName)
 	{
+		this.driver.get(BASE_URL);
 		this.wait = new WebDriverWait(this.driver, 10);
 		this.wait.until(ExpectedConditions.titleContains("Amazon.com"));
 		this.driver.findElement(By.id("twotabsearchtextbox")).clear();
@@ -86,18 +88,23 @@ public class Amazon
 		this.wait.until(
 				ExpectedConditions.elementToBeClickable(By.cssSelector(".a-declarative>input")
 						.name("submit.save-for-later.C256UWSTFUX1RV"))).click();
+		this.wait.until(ExpectedConditions.visibilityOfElementLocated(By
+				.cssSelector(".a-row.sc-list-caption")));
 		String saveForLaterBeforeDeletion = this.driver.findElement(
-				By.className("a-row sc-list-caption")).getText();
+				By.cssSelector(".a-row.sc-list-caption")).getText();
 		this.driver.findElement(By.name("submit.delete.S256UWSTFUX1RV")).click();
+		this.wait.until(ExpectedConditions.visibilityOfElementLocated(By
+				.cssSelector(".a-row.sc-list-caption")));
 		String saveForLaterAfterDeletion = this.driver.findElement(
-				By.className("a-row sc-list-caption")).getText();
+				By.cssSelector(".a-row.sc-list-caption")).getText();
 		Assert.assertNotSame(saveForLaterBeforeDeletion, saveForLaterAfterDeletion);
 		String cartNumDecrease = this.driver.findElement(By.id("nav-cart-count")).getText();
 		Assert.assertNotEquals(cartNum, cartNumDecrease);
 		;
 	}
 
-	@Test(dataProvider = "totalCost")
+	// Test 2
+	@Test(dataProvider = "totalCost", enabled = false)
 	public void threeItemsCostTest(String searchItem, String linkName, String total)
 	{
 		this.wait = new WebDriverWait(this.driver, 10);
@@ -116,5 +123,4 @@ public class Amazon
 						.cssSelector(".a-size-medium.a-color-price.sc-price.sc-white-space-nowrap.sc-price-sign"));
 		Assert.assertEquals(total, cartTotal.getText());
 	}
-
 }
