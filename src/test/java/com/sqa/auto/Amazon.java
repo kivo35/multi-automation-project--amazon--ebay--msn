@@ -34,7 +34,6 @@ public class Amazon
 	public void beforeClass()
 	{
 		this.driver = new FirefoxDriver();
-		this.BASE_URL = "http://wwww.amazon.com/";
 	}
 
 	// Test 1
