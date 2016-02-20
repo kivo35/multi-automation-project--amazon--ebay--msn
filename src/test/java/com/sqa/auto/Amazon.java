@@ -15,67 +15,107 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class Amazon {
+public class Amazon
+{
 
 	private WebDriver driver;
 
 	private WebDriverWait wait;
 
-	private String baseUrl;
+	private final static String BASE_URL = "http://amazon.com";
 
 	@AfterClass
-	public void afterClass() {
-		driver.quit();
+	public void afterClass()
+	{
+		this.driver.quit();
 	}
 
 	@BeforeClass
-	public void beforeClass() {
-		driver = new FirefoxDriver();
-		baseUrl = "http://wwww.amazon.com/";
+	public void beforeClass()
+	{
+		this.driver = new FirefoxDriver();
+		this.BASE_URL = "http://wwww.amazon.com/";
 	}
 
-	@Test(dataProvider = "quantityData")
-	public void cartQuantity(String label, String item, String quantity) {
-		driver.get(baseUrl);
+	// Test 1
+	@Test(dataProvider = "quantityData", enabled = false)
+	public void cartQuantity(String label, String item, String quantity)
+	{
+		this.driver.get(this.BASE_URL);
 		System.out.println(label);
-		driver.findElement(By.cssSelector("#twotabsearchtextbox")).sendKeys(item);
-		driver.findElement(By.cssSelector(".nav-input")).click();
-		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
-		driver.findElement(By.xpath(".//*[@id='result_1']/div/div/div/div[2]/div[1]/a/h2")).click();
-		driver.findElement(By.cssSelector("#quantity")).sendKeys(quantity);
-		driver.findElement(By.cssSelector("#add-to-cart-button")).click();
-		WebElement cartNum = driver.findElement(By.id("nav-cart-count"));
+		this.driver.findElement(By.cssSelector("#twotabsearchtextbox")).sendKeys(item);
+		this.driver.findElement(By.cssSelector(".nav-input")).click();
+		this.driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+		this.driver.findElement(By.xpath(".//*[@id='result_1']/div/div/div/div[2]/div[1]/a/h2"))
+				.click();
+		this.driver.findElement(By.cssSelector("#quantity")).sendKeys(quantity);
+		this.driver.findElement(By.cssSelector("#add-to-cart-button")).click();
+		WebElement cartNum = this.driver.findElement(By.id("nav-cart-count"));
 		System.out.println(cartNum.getText());
 		Assert.assertEquals(cartNum.getText(), quantity);
 	}
 
 	@DataProvider
-	public Object[][] quantityData() {
+	public Object[][] quantityData()
+	{
 		return new Object[][] { new Object[] { "Test 1", "Apple Watch", "3" } };
 	}
 
+	@DataProvider
+	public Object[][] saveForLaterItem()
+	{
+		return new Object[][] { new Object[] { "Shampoo",
+				"Garnier Shampoo, Sleek and Shine, 13 Fluid Ounce" } };
+	}
+
+	// Test 3
+	@Test(dataProvider = "saveForLaterItem")
+	public void saveForLaterTest(String searchItem, String linkName)
+	{
+		this.wait = new WebDriverWait(this.driver, 10);
+		this.wait.until(ExpectedConditions.titleContains("Amazon.com"));
+		this.driver.findElement(By.id("twotabsearchtextbox")).clear();
+		this.driver.findElement(By.id("twotabsearchtextbox")).sendKeys(searchItem);
+		this.driver.findElement(By.id("twotabsearchtextbox")).sendKeys(Keys.RETURN);
+		this.driver.findElement(By.linkText(linkName)).click();
+		this.driver.findElement(By.cssSelector("#add-to-cart-button")).click();
+		String cartNum = this.driver.findElement(By.id("nav-cart-count")).getText();
+		this.wait.until(ExpectedConditions.titleContains("Amazon.com Shopping Cart"));
+		this.wait.until(
+				ExpectedConditions.elementToBeClickable(By.cssSelector("#hlb-view-cart-announce")))
+				.click();
+		this.wait.until(
+				ExpectedConditions.elementToBeClickable(By.cssSelector(".a-declarative>input")
+						.name("submit.save-for-later.C256UWSTFUX1RV"))).click();
+		String saveForLaterBeforeDeletion = this.driver.findElement(
+				By.className("a-row sc-list-caption")).getText();
+		this.driver.findElement(By.name("submit.delete.S256UWSTFUX1RV")).click();
+		String saveForLaterAfterDeletion = this.driver.findElement(
+				By.className("a-row sc-list-caption")).getText();
+		Assert.assertNotSame(saveForLaterBeforeDeletion, saveForLaterAfterDeletion);
+		String cartNumDecrease = this.driver.findElement(By.id("nav-cart-count")).getText();
+		Assert.assertNotEquals(cartNum, cartNumDecrease);
+		;
+	}
+
 	@Test(dataProvider = "totalCost")
-	public void threeItemsCostTest(String searchItem, String linkName, String total) {
-		wait = new WebDriverWait(driver, 10);
-		wait.until(ExpectedConditions.titleContains("Amazon.com"));
-		driver.findElement(By.id("twotabsearchtextbox")).clear();
-		driver.findElement(By.id("twotabsearchtextbox")).sendKeys(searchItem);
-		driver.findElement(By.id("twotabsearchtextbox")).sendKeys(Keys.RETURN);
-		driver.findElement(By.linkText(linkName)).click();
-		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
-		driver.findElement(By.cssSelector("#add-to-cart-button")).click();
-		wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#nav-cart"))).click();
-		wait.until(ExpectedConditions.titleContains("Amazon.com Shopping Cart"));
-		WebElement cartTotal = driver.findElement(
-				By.cssSelector(".a-size-medium.a-color-price.sc-price.sc-white-space-nowrap.sc-price-sign"));
+	public void threeItemsCostTest(String searchItem, String linkName, String total)
+	{
+		this.wait = new WebDriverWait(this.driver, 10);
+		this.wait.until(ExpectedConditions.titleContains("Amazon.com"));
+		this.driver.findElement(By.id("twotabsearchtextbox")).clear();
+		this.driver.findElement(By.id("twotabsearchtextbox")).sendKeys(searchItem);
+		this.driver.findElement(By.id("twotabsearchtextbox")).sendKeys(Keys.RETURN);
+		this.driver.findElement(By.linkText(linkName)).click();
+		this.driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+		this.driver.findElement(By.cssSelector("#add-to-cart-button")).click();
+		this.wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#nav-cart")))
+				.click();
+		this.wait.until(ExpectedConditions.titleContains("Amazon.com Shopping Cart"));
+		WebElement cartTotal = this.driver
+				.findElement(By
+						.cssSelector(".a-size-medium.a-color-price.sc-price.sc-white-space-nowrap.sc-price-sign"));
 		Assert.assertEquals(total, cartTotal.getText());
 	}
 
-	@DataProvider
-	public Object[][] totalCost() {
-		return new Object[][] {
-				new Object[] { "toy", "Manhattan Toy Winkel Rattle and Sensory Teether Activity Toy", "$8.59" },
-				{ "map", "World Map Vintage Style Poster Print", "$12.17" },
-				{ "vacuum cleaner", "Soniclean Galaxy 1150 Canister Vacuum Cleaner", "$362.16" } };
-	}
 }
