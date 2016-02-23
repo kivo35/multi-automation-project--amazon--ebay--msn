@@ -81,7 +81,7 @@ public class Amazon {
 	 * @param quantity
 	 *            multiples of the item
 	 */
-	@Test(dataProvider = "quantityData", enabled = false)
+	@Test(dataProvider = "quantityData")
 	public void cartQuantity(String item, String quantity) {
 		driver.get(BASE_URL);
 		driver.findElement(By.cssSelector("#twotabsearchtextbox")).sendKeys(item);
@@ -106,7 +106,7 @@ public class Amazon {
 	}
 
 	// Test 3
-	@Test(dataProvider = "saveForLaterItem", enabled = false)
+	@Test(dataProvider = "saveForLaterItem")
 	public void saveForLaterTest(String searchItem, String linkName) {
 		driver.get(BASE_URL);
 		wait = new WebDriverWait(driver, 10);
@@ -132,7 +132,7 @@ public class Amazon {
 	}
 
 	// Test 2
-	@Test(dataProvider = "totalCost", enabled = false)
+	@Test(dataProvider = "totalCost")
 	public void threeItemsCostTest(String searchItem, String linkName, String total) {
 		wait = new WebDriverWait(driver, 10);
 		wait.until(ExpectedConditions.titleContains("Amazon.com"));
