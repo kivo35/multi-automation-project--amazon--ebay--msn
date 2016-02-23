@@ -7,6 +7,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
@@ -18,6 +19,8 @@ import org.testng.annotations.Test;
 public class Amazon {
 
 	private final static String BASE_URL = "http://amazon.com";
+
+	private Actions action;
 
 	private WebDriver driver;
 
@@ -31,13 +34,56 @@ public class Amazon {
 	@BeforeClass
 	public void beforeClass() {
 		driver = new FirefoxDriver();
+		action = new Actions(driver);
 	}
 
-	// Test 1
-	@Test(dataProvider = "quantityData")
-	public void cartQuantity(String label, String item, String quantity) {
+	/**
+	 * Test that navigates to amazons department pages using the 2 tier
+	 * navigation menu on the home page and verifies the page title is correct
+	 *
+	 * @param tier1Selection
+	 *            xpath of tier 1 department selection
+	 * @param tier2Selection
+	 *            xpath of tier 2 department selection
+	 * @param title
+	 *            expected title of page after selecting tier 2 element
+	 */
+	@Test(dataProvider = "browseDepData")
+	public void browseDepartments(String tier1Selection, String tier2Selection, String title) {
 		driver.get(BASE_URL);
-		System.out.println(label);
+		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+		WebElement byDepartment = driver.findElement(By.cssSelector("#nav-link-shopall"));
+		action.moveToElement(byDepartment);
+		action.perform();
+		WebElement tier1 = driver.findElement(By.xpath(tier1Selection));
+		action.moveToElement(tier1);
+		action.perform();
+		driver.findElement(By.xpath(tier2Selection)).click();
+		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+		Assert.assertEquals(driver.getTitle(), title);
+	}
+
+	@DataProvider
+	public Object[][] browseDepData() {
+		return new Object[][] {
+				new Object[] { ".//*[@id='nav-flyout-shopAll']/div[2]/span[9]",
+						".//*[@id='nav-flyout-shopAll']/div[3]/div[9]/div[1]/a[1]", "Amazon.com: Books" },
+				{ ".//*[@id='nav-flyout-shopAll']/div[2]/span[10]",
+						".//*[@id='nav-flyout-shopAll']/div[3]/div[10]/div/a[1]", "Amazon.com: Movies & TV" } };
+	}
+
+	/**
+	 * Test that adds a specified quantity of a particular item to the users
+	 * cart and verifies the sum was added
+	 *
+	 * @param item
+	 *            search for
+	 * @param quantity
+	 *            multiples of the item
+	 */
+	@Test(dataProvider = "quantityData", enabled = false)
+	public void cartQuantity(String item, String quantity) {
+		driver.get(BASE_URL);
 		driver.findElement(By.cssSelector("#twotabsearchtextbox")).sendKeys(item);
 		driver.findElement(By.cssSelector(".nav-input")).click();
 		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
@@ -51,8 +97,7 @@ public class Amazon {
 
 	@DataProvider
 	public Object[][] quantityData() {
-		return new Object[][] { new Object[] { "Test 1", "Apple Watch", "3" }, { "Test 2", "Macbook Pro", "2" },
-				{ "Test 3", "Red Ball", "4" } };
+		return new Object[][] { new Object[] { "Apple Watch", "3" }, { "Macbook Pro", "2" }, { "Red Ball", "4" } };
 	}
 
 	@DataProvider
@@ -61,7 +106,7 @@ public class Amazon {
 	}
 
 	// Test 3
-	@Test(dataProvider = "saveForLaterItem")
+	@Test(dataProvider = "saveForLaterItem", enabled = false)
 	public void saveForLaterTest(String searchItem, String linkName) {
 		driver.get(BASE_URL);
 		wait = new WebDriverWait(driver, 10);
@@ -84,11 +129,10 @@ public class Amazon {
 		Assert.assertNotSame(saveForLaterBeforeDeletion, saveForLaterAfterDeletion);
 		String cartNumDecrease = driver.findElement(By.id("nav-cart-count")).getText();
 		Assert.assertNotEquals(cartNum, cartNumDecrease);
-		;
 	}
 
 	// Test 2
-	@Test(dataProvider = "totalCost")
+	@Test(dataProvider = "totalCost", enabled = false)
 	public void threeItemsCostTest(String searchItem, String linkName, String total) {
 		wait = new WebDriverWait(driver, 10);
 		wait.until(ExpectedConditions.titleContains("Amazon.com"));
