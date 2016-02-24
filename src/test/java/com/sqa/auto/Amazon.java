@@ -100,7 +100,6 @@ public class Amazon
 		Assert.assertNotSame(saveForLaterBeforeDeletion, saveForLaterAfterDeletion);
 		String cartNumDecrease = this.driver.findElement(By.id("nav-cart-count")).getText();
 		Assert.assertNotEquals(cartNum, cartNumDecrease);
-		;
 	}
 
 	// Test 2
