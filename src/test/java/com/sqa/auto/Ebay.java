@@ -55,6 +55,7 @@ public class Ebay {
 	@AfterClass
 	public void afterClass() {
 		driver.quit();
+	}
 
 	@BeforeClass
 	public void beforeClass() {
@@ -62,7 +63,7 @@ public class Ebay {
 		action = new Actions(driver);
 	}
 
-	@Test(enabled = false)
+	@Test
 	public void dropDownAddToCart() {
 		driver.get(BASE_URL);
 		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
