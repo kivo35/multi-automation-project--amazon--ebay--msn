@@ -1,5 +1,6 @@
 package com.sqa.auto;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
@@ -7,6 +8,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -20,9 +23,37 @@ public class Ebay {
 
 	private Actions action;
 
+	private WebDriverWait wait;
+
+	@Test
+	public void addToWatchList() {
+		wait = new WebDriverWait(driver, 10);
+		boolean result = false;
+		driver.get(BASE_URL);
+		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+		driver.findElement(By.cssSelector("#gh-ug>a")).click();
+		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+		driver.findElement(By.cssSelector("#userid")).sendKeys("chance+testing@rev.com");
+		driver.findElement(By.cssSelector("#pass")).sendKeys("Test@123");
+		driver.findElement(By.cssSelector("#sgnBt")).click();
+		driver.findElement(By.cssSelector("#gh-ac")).sendKeys("comics");
+		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+		driver.findElement(By.cssSelector("#gh-btn")).click();
+		String selected = driver.findElement(By.cssSelector(".vip")).getText();
+		driver.findElement(By.cssSelector(".vip")).click();
+		driver.findElement(By.linkText("Add to watch list")).click();
+		wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#w1-5-_lmsg>a"))).click();
+		List<WebElement> watchItems = driver.findElements(By.cssSelector(".vip.item-title"));
+		for (WebElement item : watchItems) {
+			if (item.getText().equals(selected)) {
+				result = true;
+			}
+		}
+		Assert.assertEquals(result, true);
+	}
+
 	@AfterClass
 	public void afterClass() {
-		driver.quit();
 	}
 
 	@BeforeClass
@@ -31,7 +62,7 @@ public class Ebay {
 		action = new Actions(driver);
 	}
 
-	@Test
+	@Test(enabled = false)
 	public void dropDownAddToCart() {
 		driver.get(BASE_URL);
 		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
