@@ -23,5 +23,3 @@ Validate that the total cost comes out to what they would expect to have in thei
 *  User selects at topic from the menu at the top. Validate that their are at least 6 items under a specific topic within that category.
 
 * Find a weather panel, change the current location to something else, change temperature from 'F' to 'C'. Click submit and verify that weather report panel is updated on the main page.
-
-

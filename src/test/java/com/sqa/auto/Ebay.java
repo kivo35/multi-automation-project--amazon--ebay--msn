@@ -54,7 +54,7 @@ public class Ebay {
 
 	@AfterClass
 	public void afterClass() {
-	}
+		driver.quit();
 
 	@BeforeClass
 	public void beforeClass() {
