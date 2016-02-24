@@ -64,8 +64,8 @@ public class Amazon
 	@DataProvider
 	public Object[][] saveForLaterItem()
 	{
-		return new Object[][] { new Object[] { "Shampoo",
-				"Garnier Shampoo, Sleek and Shine, 13 Fluid Ounce" } };
+		return new Object[][] {
+				new Object[] { "Shampoo", "Garnier Shampoo, Sleek and Shine, 13 Fluid Ounce" } };
 	}
 
 	// Test 3
@@ -85,18 +85,18 @@ public class Amazon
 		this.wait.until(
 				ExpectedConditions.elementToBeClickable(By.cssSelector("#hlb-view-cart-announce")))
 				.click();
-		this.wait.until(
-				ExpectedConditions.elementToBeClickable(By.cssSelector(".a-declarative>input")
-						.name("submit.save-for-later.C256UWSTFUX1RV"))).click();
-		this.wait.until(ExpectedConditions.visibilityOfElementLocated(By
-				.cssSelector(".a-row.sc-list-caption")));
-		String saveForLaterBeforeDeletion = this.driver.findElement(
-				By.cssSelector(".a-row.sc-list-caption")).getText();
+		this.wait.until(ExpectedConditions.elementToBeClickable(By
+				.cssSelector(".a-declarative>input").name("submit.save-for-later.C256UWSTFUX1RV")))
+				.click();
+		this.wait.until(ExpectedConditions
+				.visibilityOfElementLocated(By.cssSelector(".a-row.sc-list-caption")));
+		String saveForLaterBeforeDeletion = this.driver
+				.findElement(By.cssSelector(".a-row.sc-list-caption")).getText();
 		this.driver.findElement(By.name("submit.delete.S256UWSTFUX1RV")).click();
-		this.wait.until(ExpectedConditions.visibilityOfElementLocated(By
-				.cssSelector(".a-row.sc-list-caption")));
-		String saveForLaterAfterDeletion = this.driver.findElement(
-				By.cssSelector(".a-row.sc-list-caption")).getText();
+		this.wait.until(ExpectedConditions
+				.visibilityOfElementLocated(By.cssSelector(".a-row.sc-list-caption")));
+		String saveForLaterAfterDeletion = this.driver
+				.findElement(By.cssSelector(".a-row.sc-list-caption")).getText();
 		Assert.assertNotSame(saveForLaterBeforeDeletion, saveForLaterAfterDeletion);
 		String cartNumDecrease = this.driver.findElement(By.id("nav-cart-count")).getText();
 		Assert.assertNotEquals(cartNum, cartNumDecrease);
@@ -117,9 +117,8 @@ public class Amazon
 		this.wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#nav-cart")))
 				.click();
 		this.wait.until(ExpectedConditions.titleContains("Amazon.com Shopping Cart"));
-		WebElement cartTotal = this.driver
-				.findElement(By
-						.cssSelector(".a-size-medium.a-color-price.sc-price.sc-white-space-nowrap.sc-price-sign"));
+		WebElement cartTotal = this.driver.findElement(By.cssSelector(
+				".a-size-medium.a-color-price.sc-price.sc-white-space-nowrap.sc-price-sign"));
 		Assert.assertEquals(total, cartTotal.getText());
 	}
 }
