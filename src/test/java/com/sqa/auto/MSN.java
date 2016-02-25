@@ -8,8 +8,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -25,6 +25,8 @@ public class MSN
 	private final static String BASE_URL = "http://www.msn.com/";
 	private WebDriver driver;
 	private WebDriverWait wait;
+	private Actions action;
+	private JavascriptExecutor js;
 
 	@AfterClass
 	public void afterClass()
@@ -36,6 +38,7 @@ public class MSN
 	public void beforeClass()
 	{
 		this.driver = new FirefoxDriver();
+		this.action = new Actions(this.driver);
 	}
 
 	// Test 2
@@ -47,8 +50,8 @@ public class MSN
 		this.wait = new WebDriverWait(this.driver, 10);
 		SelUtil.gotoAndClick(this.driver, category, STRATEGY.CLASSNAME);
 		SelUtil.gotoAndClick(this.driver, topic, STRATEGY.TEXT);
-		this.wait.until(ExpectedConditions.visibilityOfElementLocated(
-				By.cssSelector(".skyline.headline-template.loaded.layout-small")));
+		this.wait.until(ExpectedConditions.visibilityOfElementLocated(By
+				.cssSelector(".skyline.headline-template.loaded.layout-small")));
 
 		WebElement newsPanel = this.driver.findElement(By.cssSelector(".newlist.list-primary"));
 		List<WebElement> articles = newsPanel.findElements(By.tagName("a"));
@@ -63,34 +66,23 @@ public class MSN
 	}
 
 	// Test 3 (needs to be fixed)
-	@Test(enabled = false)
+	@Test
 	public void changeWeatherPanel()
 	{
 		this.driver.get(BASE_URL);
-		this.driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
-		// this.wait = new WebDriverWait(this.driver, 10);
-		((JavascriptExecutor) this.driver).executeScript("click()",
-				".//*[@id='main']/div[5]/ul/li[2]/div/div[1]/a");
+		this.driver.manage().timeouts().pageLoadTimeout(20, TimeUnit.SECONDS);
+		WebElement elem = this.driver.findElement(By.xpath(".//*[@id='main']/div[5]/ul/li[2]/div/div/a"));
+		String previousLocation = this.driver.findElement(By.cssSelector(".weacity>span")).getText();
+		this.js = (JavascriptExecutor) this.driver;
+		this.js.executeScript("arguments[0].click();", elem);
+		this.driver.findElement(By.cssSelector(".add-loc-as-container>input")).sendKeys("Berlin");
+		SelUtil.gotoAndClick(this.driver, ".searchbtn", STRATEGY.CSS);
+		SelUtil.gotoAndClick(this.driver, "#celsius", STRATEGY.CSS);
+		SelUtil.gotoAndClick(this.driver, ".donebutton", STRATEGY.CSS);
 
-		// SelUtil.gotoAndClick(this.driver,
-		// ".//*[@id='main']/div[5]/ul/li[2]/div/div[1]/a",
-		// STRATEGY.XPATH);
-		this.driver.findElement(By.className("add-loc-as-container")).sendKeys("Berlin");
-		SelUtil.gotoAndClick(this.driver, "searchbtn", STRATEGY.CLASSNAME);
-		// this.driver.findElement(By.className("searchbtn")).click();
-		WebElement pickList = this.driver.findElement(By.cssSelector("div.add-loc-as-container"));
+		String currentLocation = this.driver.findElement(By.cssSelector(".weacity>span")).getText();
 
-		Select selector = new Select(pickList);
-		selector.selectByVisibleText("Berlin, BE, Germany");
-
-		SelUtil.gotoAndClick(this.driver, "celcius", STRATEGY.ID);
-		// this.driver.findElement(By.id("celcius")).click();
-		// this.driver.findElement(By.className("donebutton")).click();
-		SelUtil.gotoAndClick(this.driver, "donebutton", STRATEGY.CLASSNAME);
-
-		String currentLocation = this.driver.findElement(By.className("a.weacity")).getText();
-
-		Assert.assertEquals(currentLocation, currentLocation);
+		Assert.assertNotEquals(currentLocation, previousLocation);
 	}
 
 	// Test 1
@@ -103,10 +95,8 @@ public class MSN
 		WebElement first = this.driver.findElement(By.xpath(id));
 		this.driver.get(first.getAttribute("href"));
 		this.driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
-		String conv = this.wait
-				.until(ExpectedConditions
-						.visibilityOfElementLocated(By.cssSelector("span#comment-count")))
-				.getText();
+		String conv = this.wait.until(
+				ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span#comment-count"))).getText();
 
 		// leave only numeric values in String
 		conv = conv.replaceAll("\\D+", "");
@@ -119,8 +109,7 @@ public class MSN
 	@DataProvider
 	public Object[][] epComments()
 	{
-		return new Object[][] {
-				new Object[] { ".//*[@id='main']/div[5]/ul/li[13]/div/ul/li[1]/a", 0 } };
+		return new Object[][] { new Object[] { ".//*[@id='main']/div[5]/ul/li[13]/div/ul/li[1]/a", 0 } };
 	}
 
 	@DataProvider
@@ -139,9 +128,8 @@ public class MSN
 		else
 		{
 			range = 0;
-			System.out.println(
-					"Test failed. The number of comments should be within 10-50 range, currently returns "
-							+ act);
+			System.out.println("Test failed. The number of comments should be within 10-50 range, currently returns "
+					+ act);
 		}
 		return range;
 	}
