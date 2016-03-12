@@ -5,11 +5,14 @@ import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -17,6 +20,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.google.common.base.Function;
 import com.sqa.kv.util.helper.SelUtil;
 import com.sqa.kv.util.helper.SelUtil.STRATEGY;
 
@@ -38,6 +42,7 @@ public class MSN
 	public void beforeClass()
 	{
 		this.driver = new FirefoxDriver();
+		this.wait = new WebDriverWait(this.driver, 10);
 		this.action = new Actions(this.driver);
 	}
 
@@ -47,7 +52,6 @@ public class MSN
 	{
 		this.driver.get(this.BASE_URL);
 		this.driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
-		this.wait = new WebDriverWait(this.driver, 10);
 		SelUtil.gotoAndClick(this.driver, category, STRATEGY.CLASSNAME);
 		SelUtil.gotoAndClick(this.driver, topic, STRATEGY.TEXT);
 		this.wait.until(ExpectedConditions.visibilityOfElementLocated(By
@@ -65,7 +69,7 @@ public class MSN
 		}
 	}
 
-	// Test 3 (needs to be fixed)
+	// Test 3
 	@Test
 	public void changeWeatherPanel()
 	{
@@ -76,7 +80,25 @@ public class MSN
 		this.js = (JavascriptExecutor) this.driver;
 		this.js.executeScript("arguments[0].click();", elem);
 		this.driver.findElement(By.cssSelector(".add-loc-as-container>input")).sendKeys("Berlin");
+
 		SelUtil.gotoAndClick(this.driver, ".searchbtn", STRATEGY.CSS);
+		this.driver.findElement(By.cssSelector(".add-loc-as-container>input")).click();
+
+		Wait<WebDriver> wait = new FluentWait<WebDriver>(this.driver).withTimeout(10, TimeUnit.SECONDS)
+				.pollingEvery(3, TimeUnit.SECONDS).ignoring(NoSuchElementException.class);
+
+		WebElement dropDownList = wait.until(new Function<WebDriver, WebElement>()
+		{
+			@Override
+			public WebElement apply(WebDriver driver)
+			{
+				return driver.findElement(By.id("locList"));
+			}
+		});
+
+		WebElement selection = this.driver.findElement(By.cssSelector("#locList>li:nth-child(1)"));
+		this.action.moveToElement(selection).click().perform();
+
 		SelUtil.gotoAndClick(this.driver, "#celsius", STRATEGY.CSS);
 		SelUtil.gotoAndClick(this.driver, ".donebutton", STRATEGY.CSS);
 
@@ -91,10 +113,9 @@ public class MSN
 	{
 		this.driver.get(this.BASE_URL);
 		this.driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
-		this.wait = new WebDriverWait(this.driver, 10);
 		WebElement first = this.driver.findElement(By.xpath(id));
 		this.driver.get(first.getAttribute("href"));
-		this.driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+		this.driver.manage().timeouts().pageLoadTimeout(20, TimeUnit.SECONDS);
 		String conv = this.wait.until(
 				ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span#comment-count"))).getText();
 
